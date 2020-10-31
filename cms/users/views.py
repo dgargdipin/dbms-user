@@ -3,12 +3,14 @@
 #logout user
 # account update UserForm)
 
-from flask import render_template,url_for,flash,redirect,request,Blueprint
+from flask import render_template,url_for,flash,redirect,request,Blueprint,abort
 from flask_login import login_user,current_user,logout_user,login_required
-from puppycompanyblog import db
-from puppycompanyblog.models import User
-from puppycompanyblog.users.forms import RegistrationForm,LoginForm,UpdateUserForm
+from cms import db
+from cms.models import User,Course
+from cms.users.forms import RegistrationForm,LoginForm,UpdateUserForm
 users=Blueprint('users',__name__)
+
+
 
 @users.route('/register',methods=['GET', 'POST'])
 def register():
@@ -16,8 +18,8 @@ def register():
     if form.validate_on_submit():
         # user_data={k:v.data for k,v in form}
         # print(user_data)
-        print(form)
-        user=User(form.email.data,form.password.data,form.year.data,form.branch.data)
+        print("name is",form.name.data)
+        user=User(form.name.data,form.email.data,form.password.data,form.year.data,form.branch.data)
         db.session.add(user)
         db.session.commit()
         flash('Thanks for registration!')
@@ -61,3 +63,20 @@ def account():
         form.email.data=current_user.email
     return render_template('account.html',form=form)
 
+@users.route('/enroll')
+@login_required
+def enroll():
+
+    avail_courses=[a for a in Course.query.filter_by(can_apply=True).all() if a not in current_user.courses and current_user.branch.name in [b.name for b in a.branches] ]
+    return render_template('enroll.html',avail_courses=avail_courses)
+@users.route('/enroll/<course_id>')
+@login_required
+def enroll_course(course_id):
+    courseToAdd=Course.query.filter_by(id=course_id).first()
+    if courseToAdd is None or courseToAdd in current_user.courses:
+        flash("Course cannot be added")
+        abort(405)
+    current_user.courses.append(courseToAdd)
+    db.session.commit()
+    return redirect(url_for('core.index'))
+    

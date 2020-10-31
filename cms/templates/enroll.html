@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Index</th>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Eligible for</th>
+            <th>Enroll</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for course in avail_courses %}
+                <tr>
+                    <td scope="row">{{loop.index}}</td>
+                    <td>{{course.name}}</td>
+                    <td>{{course.course_code}}</td>
+                    <td>{{ course.branches|join(', ') }}</td>
+                    <td><a class="btn btn-primary" href="{{url_for('users.enroll_course',course_id=course.id)}}" role="button">Enroll</a></td>
+                </tr>
+        {% endfor %}
+        
+    </tbody>
+</table>
+
+{% endblock %}

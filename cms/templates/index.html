@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="jumbotron"><h1 class="display-4">{% if current_user.is_authenticated %}
+Welcome {{current_user.name}}
+
+<hr class="my-4">
+<p class="lead float-left">Branch: {{current_user.branch}}<br>Year: {{current_user.year}}</p><a class="btn btn-primary float-right" href="{{url_for('users.enroll')}}" role="button">Enroll in courses     </a>
+{%else%}
+Welcome to CMS
+<hr class="my-4">
+{% endif %}</h1>
+</div>
+<div class="container">{% if current_user.is_authenticated %}{% if current_user.courses %}
+        <h3>Your Courses</h3>
+        
+        <table class="table">
+                <thead>
+                        <tr>
+                                <th>Index</th>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Eligible for</th>
+                                <th>Professor</th>
+                        </tr>
+                </thead>
+                <tbody>
+                        {% for course in enrolled_courses %}
+                        <tr>
+                                <td scope="row">{{loop.index}}</td>
+                                <td>{{course.name}}</td>
+                                <td>{{course.course_code}}</td>
+                                <td>{{ course.branches|join(', ') }}</td>
+                                <td>{{course.professor.name}}</a></td>
+                        </tr>
+                        {% endfor %}
+        
+                </tbody>
+        </table>
+{% else %}
+        Please enroll in courses
+{% endif %}
+{% endif %}
+
+</div>
+{% endblock %}
+
+

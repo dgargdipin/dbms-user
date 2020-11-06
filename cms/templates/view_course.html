@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-3">{{course.name}}</h1>
+    <p class="lead">{{course.details}}</p>
+    <hr class="my-2">
+    <p>Professor: {{course.professor.name}}<br> Branch: {{course.branches|join(', ')}}</p>
+    <p class="lead">
+        <!-- <a class="btn btn-danger" href="{{url_for('course.unenroll',course_id=course.id)}}" role="button">Drop Course</a> -->
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDrop">Drop Course</button>
+    </p>
+</div>
+
+<div id="accordion">
+  <div class="card">
+    <div class="card-header" id="headingOne">
+      <h5 class="mb-0">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Course Material
+        </button>
+      </h5>
+    </div>
+
+    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+      <div class="card-body">
+    {% if course.courseNotes %}
+    {% for courseNote in course.courseNotes %}
+    <div class="card" style="width: 100%;">
+      <div class="card-body">
+        <h5 class="card-title">{{courseNote.title}}
+        </h5>
+    
+        <p class="card-text" style="white-space: pre-wrap;">{{courseNote.details}}</p>
+        {% if courseNote.attachments %}
+        <h6>Attachments:</h6>
+        {% for attachment in courseNote.attachments %}
+        <a href="{{attachment.link}}" class="card-link">{{attachment.name}}</a>
+        {% endfor %}
+    
+        {% endif %}
+    
+    
+      </div>
+      <div class="card-footer">{{courseNote.time.strftime('%I:%M %p, %d %b %Y' )}}</div>
+    
+    </div>
+    {% endfor %}
+    {% else %}
+    Professor has provided no course notes :(
+    {% endif %}
+        
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header" id="headingTwo">
+      <h5 class="mb-0">
+        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Students registered
+        </button>
+      </h5>
+    </div>
+    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+      <div class="card-body">
+        {% if course.students %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Full Name</th>
+                            <th scope="col">Branch</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       {% for student in course.students %}
+                                <tr>
+                                    <th scope="row">{{loop.index}}</th>
+                                    <td>{{student.name}}</td>
+                                    <td>{{student.branch.name}}</td>
+                                </tr>
+                       {% endfor %}
+                    </tbody>
+                </table>
+        {% else %}
+                No students registered yet!
+        {% endif %}
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+<!-- Modal -->
+<div class="modal fade" id="confirmDrop" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Please confirm if you want to drop this course.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a class="btn btn-danger" href="{{url_for('course.unenroll',course_id=course.id)}}" role="button">Drop Course</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

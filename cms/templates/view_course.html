@@ -1,5 +1,16 @@
 {% extends "base.html" %}
-
+{% macro form_field(field) %}
+<dt>{{ field.label }}
+<dd>{{ field(**kwargs)|safe }}
+  {% if field.errors %}
+  <ul class=errors>
+    {% for error in field.errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</dd>
+{% endmacro %}
 {% block content %}
 <div class="jumbotron">
     <h1 class="display-3">{{course.name}}</h1>
@@ -13,6 +24,62 @@
 </div>
 
 <div id="accordion">
+  <div class="card">
+    <div class="card-header" id="headingOne">
+      <h5 class="mb-0">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true"
+          aria-controls="collapseOne">
+          Assignments
+        </button>
+      </h5>
+    </div>
+  
+    <div id="collapseThree" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+      <div class="card-body">
+        {% if course.assignments %}
+        {% for assignment in course.assignments %}
+        <div class="card" style="width: 100%;">
+          <div class="card-body">
+            <h5 class="card-title">{{assignment.title}}<small class="text-muted"> Deadline : <u>{{assignment.deadline.strftime('%I:%M %p, %d %b %Y')}}</u></small>
+            </h5>
+            <p class="card-text" style="white-space: pre-wrap;">{{assignment.details}}</p>
+            Submission Status:
+            {% if assignment.id in submissionArray %}
+               <b> Submitted</b>
+            {% else %}
+            
+          {% if assignment.deadline.now()<assignment.deadline %}
+               <b>Not Submitted</b><br><br>
+
+          <a data-id={{assignment.id}} type="button" class="btn btn-info assignmentLink" data-toggle="modal"
+            data-target="#submitAssignment">Submit</a>
+          {% endif %}
+            {% endif %}
+            
+           
+
+            {% if assignment.attachments %}
+            <h6>Attachments:</h6>
+            {% for attachment in assignment.attachments %}
+            <a href="{{attachment.link}}" class="card-link">{{attachment.name}}</a>
+            {% endfor %}
+  
+            {% endif %}
+  
+  
+          </div>
+          <div class="card-footer">{{assignment.time.strftime('%I:%M %p, %d %b %Y' )}}</div>
+  
+        </div>
+        {% endfor %}
+        {% else %}
+        Professor has provided no course notes :(
+        {% endif %}
+  
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header" id="headingOne">
       <h5 class="mb-0">
@@ -53,6 +120,7 @@
       </div>
     </div>
   </div>
+
   <div class="card">
     <div class="card-header" id="headingTwo">
       <h5 class="mb-0">
@@ -113,4 +181,45 @@
   </div>
 </div>
 
+<div class="modal fade" id="submitAssignment" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Submit Assignment</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form enctype="multipart/form-data" method="POST">
+          {{form.hidden_tag()}}
+
+
+          <div class="form-group">
+            {{form.title.label(class='form-group')}}
+            {{form.title(class='form-control')}}
+          </div>
+          <div class="form-group">
+            {{form.details.label(class='form-group')}}
+            {{form.details(class='form-control')}}
+          </div>
+          <div class="form-group assignment">
+            {{form.assignment_id.label(class='form-group')}}
+            {{form.assignment_id(class_='form-control assignmentInput',readonly=true)}}
+          </div>
+          <div class="form-group">
+            {{form_field(form.attachments)}}
+          </div>
+
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        {{form.submit(class='btn btn-primary')}}</form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

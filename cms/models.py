@@ -43,6 +43,7 @@ class User(db.Model,UserMixin):
     branch_id=db.Column(db.Integer,db.ForeignKey('branches.id'))
     courses = db.relationship('Course', secondary=course_helper,
                               backref=db.backref('students'))
+    submissions=db.relationship('Submission',backref='user')
     def __init__(self,name,email,password,year,branch_id):
         self.name=name
         self.email=email
@@ -64,7 +65,10 @@ class Course(db.Model):
     course_code = db.Column(db.String(), unique=True)
     branches=db.relationship('Branch',secondary=branch_helper,backref=db.backref('courses'))
     can_apply=db.Column(db.Boolean)
-    courseNotes = db.relationship('courseNote', backref='Course')
+    courseNotes = db.relationship(
+        'courseNote', backref='Course', order_by="desc(courseNote.time)")
+    assignments = db.relationship(
+        'Assignment', backref='Course', order_by="desc(Assignment.time)")
     def __init__(self, name, course_code, details, prof_id,can_apply,):
         self.name = name
         self.course_code = course_code
@@ -100,15 +104,50 @@ class courseNote(db.Model):
         self.title=title
         self.details=details
         self.course_id=course_id
+class Assignment(db.Model):
+    __tablename__='assignments'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String())
+    details = db.Column(db.String())
+    time=db.Column(db.DateTime,nullable=False,default=datetime.now)
+    attachments=db.relationship('Attachment',backref='assignment')
+    submissions=db.relationship('Submission',backref='assignment')
+    deadline=db.Column(db.DateTime)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    def __init__(self,title,details,deadline,course_id):
+        self.title=title
+        self.details=details
+        self.deadline=deadline
+        self.course_id=course_id
+
 class Attachment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
     ext = db.Column(db.String(10))
     link = db.Column(db.String())
     coursenote_id=db.Column(db.Integer,db.ForeignKey('coursenotes.id'))
-    def __init__(self,name,ext,link,coursenote_id):
+    assignment_id=db.Column(db.Integer,db.ForeignKey('assignments.id'))
+    submission_id=db.Column(db.Integer,db.ForeignKey('submission.id'))
+
+    def __init__(self,name,ext,link,coursenote_id=None,assignment_id=None,submission_id=None):
         self.name=name
         self.ext=ext
         self.link=link
         self.coursenote_id=coursenote_id
-    
+        self.assignment_id=assignment_id
+        self.submission_id = submission_id
+
+
+class Submission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String())
+    details = db.Column(db.String())
+    time = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    attachments = db.relationship('Attachment', backref='submissions')
+    assignment_id = db.Column(db.Integer, db.ForeignKey('assignments.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    def __init__(self, title, details, assignment_id,user_id):
+        self.title = title
+        self.details = details
+        self.assignment_id = assignment_id
+        self.user_id=user_id

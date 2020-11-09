@@ -1,15 +1,10 @@
 {% extends "base.html" %}
-{% macro form_field(field) %}
-<dt>{{ field.label }}
-<dd>{{ field(**kwargs)|safe }}
-    {% if field.errors %}
-    <ul class=errors>
-        {% for error in field.errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-</dd>
+{% macro error_field(field) %}
+{% if field.errors %}
+{% for error in field.errors %}
+<div class="alert alert-danger" role="alert">{{ error }}</div>
+{% endfor %}
+{% endif %}
 {% endmacro %}
 
 {% macro form_field2(field) -%}
@@ -62,20 +57,62 @@
   {% endif %}
 {% endwith %}
 
-  <form method="POST">
-    {# 
-    {{form.email.label}}{{form.email}}<br>
-    {{form.username.label}}{{form.username}}<br>
-    {{form.password.label}}{{form.password}}<br>
-    {{form.pass_confirm.label}}{{form.pass_confirm}}<br>
-    {{form.submit()}} #}
-    {{form.hidden_tag()}}
-    {{form_field(form.name)}}<br>
-    {{form_field(form.email)}}<br>
-    {{form_field(form.year)}}<br>
-    {{form_field(form.branch)}}<br>
-    {{form_field(form.password)}}<br>
-    {{form_field(form.pass_confirm)}}<br>
-    {{form_field(form.submit)}}<br>
-  </form>
+    {{error_field(form.name)}}
+    {{error_field(form.email)}}
+    {{error_field(form.branch)}}
+    {{error_field(form.password)}}
+    {{error_field(form.pass_confirm)}}
+    {{error_field(form.submit)}}
+<div class="signup-form">
+    <form method="POST" class="form-horizontal">
+        {{form.hidden_tag()}}
+        <div class="col-xs-8 col-xs-offset-4">
+            <h2>Register</h2>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-4">{{form.name.label}}</label>
+            <div class="col-xs-8">
+                {{form.name(class_='form-control',required="required")}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-4">{{form.email.label}}</label>
+            <div class="col-xs-8">
+                {{form.email(class_='form-control',required="required")}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-4" for="sel1">{{form.year.label}}</label>
+            <div class="col-xs-8">
+                {{form.year(class_='form-control',required="required")}}
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-4" for="sel1">{{form.branch.label}}</label>
+            <div class="col-xs-8">
+                {{form.branch(class_='form-control',required="required")}}
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-4">{{form.password.label}}</label>
+            <div class="col-xs-8">
+                {{form.password(class_='form-control',required="required")}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-4">{{form.pass_confirm.label}}</label>
+            <div class="col-xs-8">
+                {{form.pass_confirm(class_='form-control',required="required")}}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-8 col-xs-offset-4">
+                {{form.submit(class_="btn btn-primary btn-lg")}}
+            </div>
+        </div>
+    </form>
+</div>
+
 {% endblock %}

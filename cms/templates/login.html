@@ -1,19 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for category, message in messages %}
-      <li class="{{ category }}">{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-success">
+  {{ message }}</div>
+{% endfor %}
+</ul>
+{% endif %}
 {% endwith %}
 
-  <form method="POST">
+<div class="signup-form">
+  <form method="POST" class="form-horizontal" autocomplete="off">
     {{form.hidden_tag()}}
-    {{form.email.label}}{{form.email}}<br>
-    {{form.password.label}}{{form.password}}<br>
-    {{form.submit()}}
+    <div class="col-xs-8 col-xs-offset-4">
+      <h2>Login</h2>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-xs-4">{{form.email.label}}</label>
+      <div class="col-xs-8">
+        {{form.email(class='form-control',required='required',type='email',autocomplete="off")}}
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-xs-4">{{form.password.label}}</label>
+      <div class="col-xs-8">
+        {{form.password(class='form-control',required='required',autocomplete="off")}}
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-xs-8 col-xs-offset-4">
+        {{form.submit(class="btn btn-primary btn-lg")}}
+      </div>
+    </div>
   </form>
+</div>
+
 {% endblock %}

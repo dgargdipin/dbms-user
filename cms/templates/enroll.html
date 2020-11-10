@@ -24,5 +24,31 @@
         
     </tbody>
 </table>
+<hr>
+<h2>Request to enroll</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Index</th>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Eligible for</th>
+            <th>Request</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for course in not_eligible_courses %}
+        <tr>
+            <td scope="row">{{loop.index}}</td>
+            <td>{{course.name}}</td>
+            <td>{{course.course_code}}</td>
+            <td>{{ course.branches|join(', ') }}</td>
+            <td><a class="btn btn-primary" href="{{url_for('users.enroll_course',course_id=course.id)}}"
+                    role="button">Enroll</a></td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
 
 {% endblock %}

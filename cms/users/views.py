@@ -63,12 +63,16 @@ def account():
         form.email.data=current_user.email
     return render_template('account.html',form=form)
 
+
+
 @users.route('/enroll')
 @login_required
 def enroll():
-
     avail_courses=[a for a in Course.query.filter_by(can_apply=True).all() if a not in current_user.courses and current_user.branch.name in [b.name for b in a.branches] ]
-    return render_template('enroll.html',avail_courses=avail_courses)
+    not_eligible_courses=[a for a in Course.query.filter_by(can_apply=True).all() if a not in current_user.courses and current_user.branch.name not in [b.name for b in a.branches] ]
+    return render_template('enroll.html',avail_courses=avail_courses,not_eligible_courses=not_eligible_courses)
+
+
 @users.route('/enroll/<course_id>')
 @login_required
 def enroll_course(course_id):

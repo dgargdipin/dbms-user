@@ -48,8 +48,8 @@
                <b> Submitted</b>
             {% else %}
             
+            <b>Not Submitted</b><br><br>
           {% if assignment.deadline.now()<assignment.deadline %}
-               <b>Not Submitted</b><br><br>
 
           <a data-id={{assignment.id}} type="button" class="btn btn-info assignmentLink" data-toggle="modal"
             data-target="#submitAssignment">Submit</a>

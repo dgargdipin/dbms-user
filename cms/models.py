@@ -21,6 +21,7 @@ branch_helper=db.Table('branch_helper',
                         )
 
 
+
 class Branch(db.Model):
     __tablename__='branches'
     id= db.Column(db.Integer, primary_key=True)
@@ -44,6 +45,7 @@ class User(db.Model,UserMixin):
     courses = db.relationship('Course', secondary=course_helper,
                               backref=db.backref('students'))
     submissions=db.relationship('Submission',backref='user')
+    requests=db.relationship('Request',backref='user')
     def __init__(self,name,email,password,year,branch_id):
         self.name=name
         self.email=email
@@ -53,7 +55,14 @@ class User(db.Model,UserMixin):
 
     def check_password(self,password):
         return check_password_hash(self.password_hash,password)
+    
 
+    @property
+    def requested_courses(self):
+        req_courses=[]
+        for request in self.requests:
+            req_courses.append(request.course)
+        return req_courses
 
 class Course(db.Model):
     __tablename__ = 'courses'
@@ -69,6 +78,7 @@ class Course(db.Model):
         'courseNote', backref='Course', order_by="desc(courseNote.time)")
     assignments = db.relationship(
         'Assignment', backref='Course', order_by="desc(Assignment.time)")
+    requests = db.relationship('Request', backref='course')
     def __init__(self, name, course_code, details, prof_id,can_apply,):
         self.name = name
         self.course_code = course_code
@@ -151,3 +161,13 @@ class Submission(db.Model):
         self.details = details
         self.assignment_id = assignment_id
         self.user_id=user_id
+
+
+class Request(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    def __init__(self,user_id,course_id):
+        self.user_id=user_id
+        self.course_id=course_id
+    pass

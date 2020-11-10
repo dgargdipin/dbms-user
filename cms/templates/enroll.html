@@ -1,54 +1,78 @@
 {% extends "base.html" %}
 
 {% block content %}
-<table class="table">
-    <thead>
-        <tr>
-            <th>Index</th>
-            <th>Name</th>
-            <th>Code</th>
-            <th>Eligible for</th>
-            <th>Enroll</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for course in avail_courses %}
+{% if avail_courses %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Eligible for</th>
+                    <th>Enroll</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in avail_courses %}
                 <tr>
                     <td scope="row">{{loop.index}}</td>
                     <td>{{course.name}}</td>
                     <td>{{course.course_code}}</td>
                     <td>{{ course.branches|join(', ') }}</td>
-                    <td><a class="btn btn-primary" href="{{url_for('users.enroll_course',course_id=course.id)}}" role="button">Enroll</a></td>
+                    <td><a class="btn btn-primary" href="{{url_for('users.enroll_course',course_id=course.id)}}"
+                            role="button">Enroll</a></td>
                 </tr>
-        {% endfor %}
+                {% endfor %}
         
-    </tbody>
-</table>
-<hr>
-<h2>Request to enroll</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Index</th>
-            <th>Name</th>
-            <th>Code</th>
-            <th>Eligible for</th>
-            <th>Request</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for course in not_eligible_courses %}
-        <tr>
-            <td scope="row">{{loop.index}}</td>
-            <td>{{course.name}}</td>
-            <td>{{course.course_code}}</td>
-            <td>{{ course.branches|join(', ') }}</td>
-            <td><a class="btn btn-primary" href="{{url_for('users.enroll_course',course_id=course.id)}}"
-                    role="button">Enroll</a></td>
-        </tr>
-        {% endfor %}
+            </tbody>
+        </table>
+{% else %}
+        <div class="alert alert-secondary" role="alert">
+            No courses available to enroll.
+        </div>
+{% endif %}
 
-    </tbody>
-</table>
+{% if not_eligible_courses %}
+        <hr>
+        <h2>Request to enroll</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Eligible for</th>
+                    <th>Request</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in not_eligible_courses %}
+                <tr>
+                    <td scope="row">{{loop.index}}</td>
+                    <td>{{course.name}}</td>
+                    <td>{{course.course_code}}</td>
+                    <td>{{ course.branches|join(', ') }}</td>
+                    <td>
+                        {% if course in current_user.requested_courses %}
+                                <button class="btn btn-outline-secondary"
+                                    type="button" disabled>Request Sent</a>
+                        {% else %}
+                                <a class="btn btn-secondary btn-sm" href="{{url_for('users.request_course',course_id=course.id)}}"
+                                    role="button">Request</a>
+                        {% endif %}
+                        
+
+                    </td>
+                </tr>
+                {% endfor %}
+        
+            </tbody>
+        </table>
+
+{% else %}
+        <div class="alert alert-secondary" role="alert">
+            No courses available to request and enroll
+        </div>
+{% endif %}
 
 {% endblock %}

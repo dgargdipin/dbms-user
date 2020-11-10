@@ -6,7 +6,7 @@
 from flask import render_template,url_for,flash,redirect,request,Blueprint,abort
 from flask_login import login_user,current_user,logout_user,login_required
 from cms import db
-from cms.models import User,Course
+from cms.models import Request, User,Course
 from cms.users.forms import RegistrationForm,LoginForm,UpdateUserForm
 users=Blueprint('users',__name__)
 
@@ -84,3 +84,15 @@ def enroll_course(course_id):
     db.session.commit()
     return redirect(url_for('core.index'))
     
+
+@users.route('/request/<course_id>')
+@login_required
+def request_course(course_id):
+    courseToAdd = Course.query.filter_by(id=course_id).first()
+    if courseToAdd is None or courseToAdd in current_user.courses:
+        flash("Course cannot be added")
+        abort(405)
+    newRequest=Request(current_user.id,course_id)
+    db.session.add(newRequest)
+    db.session.commit()
+    return redirect(url_for('users.enroll'))

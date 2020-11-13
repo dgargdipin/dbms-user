@@ -1,6 +1,24 @@
 {% extends "base.html" %}
-
+{% macro form_field(field) %}
+<dt>{{ field.label }}
+<dd>{{ field(**kwargs)|safe }}
+    {% if field.errors %}
+    <ul class=errors>
+        {% for error in field.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</dd>
+{% endmacro %}
 {% block content %}
+<script>$(document).on("click", ".requestLink", function () {
+        var myBookId = $(this).data('id');
+        $(".assignment .assignmentInput").val(myBookId);
+        // As pointed out in comments, 
+        // it is unnecessary to have to manually call the modal.
+        // $('#addBookDialog').modal('show');
+    });</script>
 {% if avail_courses %}
         <table class="table">
             <thead>
@@ -53,14 +71,10 @@
                     <td>{{course.course_code}}</td>
                     <td>{{ course.branches|join(', ') }}</td>
                     <td>
-                        {% if course in current_user.requested_courses %}
-                                <button class="btn btn-outline-secondary"
-                                    type="button" disabled>Request Sent</a>
-                        {% else %}
-                                <a class="btn btn-secondary btn-sm" href="{{url_for('users.request_course',course_id=course.id)}}"
-                                    role="button">Request</a>
-                        {% endif %}
                         
+                                <a data-id={{course.id}} type="button" class="btn btn-info requestLink" data-toggle="modal"
+                                    data-target="#submitRequest">Request</a>
+
 
                     </td>
                 </tr>
@@ -73,6 +87,87 @@
         <div class="alert alert-secondary" role="alert">
             No courses available to request and enroll
         </div>
+
+{% endif %}
+{% if current_user.requests %}
+<hr>
+<h2>Previous requests</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Index</th>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Eligible for</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in current_user.requests %}
+        <tr>
+            <td scope="row">{{loop.index}}</td>
+            <td>{{request.course.name}}</td>
+            <td>{{request.course.course_code}}</td>
+            <td>{{request.course.branches|join(', ') }}</td>
+            <td>
+                {% if not request.status %}
+                Pending.
+                {% else %}
+                {% if request.status==1 %}
+                <p class="text-success">Enrolled.</p>
+                {% else %}
+                <p class="text-danger">Declined.</p>
+                {% endif %}
+
+                {% endif %}
+
+            </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
 {% endif %}
 
+<div class="modal fade" id="submitRequest" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data" method="POST">
+                    {{requestForm.hidden_tag()}}
+
+
+                    <div class="form-group">
+                        {{requestForm.title.label(class='form-group')}}
+                        {{requestForm.title(class='form-control')}}
+                    </div>
+                    <div class="form-group">
+                        {{requestForm.details.label(class='form-group')}}
+                        {{requestForm.details(class='form-control')}}
+                    </div>
+                    <div class="form-group assignment">
+                        {{requestForm.course_id.label(class='form-group')}}
+                        {{requestForm.course_id(class_='form-control assignmentInput',readonly=true)}}
+                    </div>
+                    <div class="form-group">
+                        {{form_field(requestForm.attachments)}}
+                    </div>
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                {{requestForm.submit(class='btn btn-primary')}}</form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

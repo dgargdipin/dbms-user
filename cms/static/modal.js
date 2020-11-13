@@ -5,3 +5,4 @@ $(document).on("click", ".assignmentLink", function () {
     // it is unnecessary to have to manually call the modal.
     // $('#addBookDialog').modal('show');
 });
+

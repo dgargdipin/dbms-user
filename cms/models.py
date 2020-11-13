@@ -53,9 +53,17 @@ class User(db.Model,UserMixin):
         self.year=year
         self.branch_id=branch_id
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'Name': self.name,
+            'E-Mail': self.email,
+            'Year': self.year,
+            'Branch': self.branch.name}
+
     def check_password(self,password):
         return check_password_hash(self.password_hash,password)
-    
+
 
     @property
     def requested_courses(self):
@@ -138,14 +146,16 @@ class Attachment(db.Model):
     coursenote_id=db.Column(db.Integer,db.ForeignKey('coursenotes.id'))
     assignment_id=db.Column(db.Integer,db.ForeignKey('assignments.id'))
     submission_id=db.Column(db.Integer,db.ForeignKey('submission.id'))
+    request_id = db.Column(db.Integer, db.ForeignKey('request.id'))
 
-    def __init__(self,name,ext,link,coursenote_id=None,assignment_id=None,submission_id=None):
+    def __init__(self,name,ext,link,coursenote_id=None,assignment_id=None,submission_id=None,request_id=None):
         self.name=name
         self.ext=ext
         self.link=link
         self.coursenote_id=coursenote_id
         self.assignment_id=assignment_id
-        self.submission_id = submission_id
+        self.submission_id=submission_id
+        self.request_id=request_id
 
 
 class Submission(db.Model):
@@ -167,7 +177,14 @@ class Request(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
-    def __init__(self,user_id,course_id):
+    title = db.Column(db.String())
+    details = db.Column(db.String())
+    time = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    attachments = db.relationship('Attachment', backref='request')
+    status=db.Column(db.Integer,default=0)
+    def __init__(self,user_id,course_id,title,details):
         self.user_id=user_id
         self.course_id=course_id
+        self.title=title
+        self.details=details
     pass

@@ -2,7 +2,7 @@
 
 - Create an empty folder and cd into it
 
-- Git Clone the dbms-repo repo.
+- Git Clone the dbms-user repo.
 
 - Git Clone the dbms-professor repo.
 
@@ -11,7 +11,7 @@
   
 
 ```bash
-cd user
+cd dbms-user
 python3 -m venv venv
 pip install -r requirements.txt
 source venv/bin/activate # if you're on windows run the following command instead

@@ -1,5 +1,4 @@
-#  Flask course management system with jinja2 as rendering engine
-## Usage Instructions
+# Usage Instructions
 
 - Create an empty folder and cd into it
 
@@ -23,6 +22,4 @@ python3 app.py
 
 
 The user portal can be opened up at localhost:5001
-
-
 

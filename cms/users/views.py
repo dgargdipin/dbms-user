@@ -8,6 +8,7 @@ import random
 import os
 from flask import render_template,url_for,flash,redirect,request,Blueprint,abort
 from flask_login import login_user,current_user,logout_user,login_required
+from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from cms import db,basedir
 from cms.models import Attachment, Request, User,Course
@@ -60,6 +61,8 @@ def account():
         
         if form.email.data:
             current_user.email=form.email.data
+        if form.password.data:
+            current_user.password_hash = generate_password_hash(form.password.data)
         db.session.commit()
         flash('User account updated')
         return redirect(url_for('users.account'))

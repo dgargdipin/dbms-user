@@ -40,6 +40,8 @@ def view_course(course_id):
 
                 filename, file_extension = os.path.splitext(
                     uploaded_file.filename)
+                if not filename or not file_extension:
+                    continue
                 savename = secure_filename(filename)+''.join(
                     random.choice(string.ascii_lowercase) for i in range(16))+file_extension
                 print(filename, savename)

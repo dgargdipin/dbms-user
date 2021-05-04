@@ -46,6 +46,7 @@ class User(db.Model,UserMixin):
                               backref=db.backref('students'))
     submissions=db.relationship('Submission',backref='user')
     requests=db.relationship('Request',backref='user')
+    quiz_responses=db.relationship('QuizResponse',backref='user')
     def __init__(self,name,email,password,year,branch_id):
         self.name=name
         self.email=email
@@ -87,6 +88,7 @@ class Course(db.Model):
     assignments = db.relationship(
         'Assignment', backref='Course', order_by="desc(Assignment.time)")
     requests = db.relationship('Request', backref='course')
+    quizzes=db.relationship('Quiz',backref='course')
     def __init__(self, name, course_code, details, prof_id,can_apply,):
         self.name = name
         self.course_code = course_code
@@ -146,6 +148,7 @@ class Attachment(db.Model):
     coursenote_id=db.Column(db.Integer,db.ForeignKey('coursenotes.id'))
     assignment_id=db.Column(db.Integer,db.ForeignKey('assignments.id'))
     submission_id=db.Column(db.Integer,db.ForeignKey('submission.id'))
+    post_id=db.Column(db.Integer,db.ForeignKey('discussionposts.id'))
     request_id = db.Column(db.Integer, db.ForeignKey('request.id'))
 
     def __init__(self,name,ext,link,coursenote_id=None,assignment_id=None,submission_id=None,request_id=None):
@@ -188,3 +191,90 @@ class Request(db.Model):
         self.title=title
         self.details=details
     pass
+
+
+# course
+
+class Quiz(db.Model):
+    __tablename__='quizzes'
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    name=db.Column(db.String(),nullable=False)
+    start_time=db.Column(db.DateTime,nullable=False)
+    end_time=db.Column(db.DateTime,nullable=False)
+    questions=db.relationship('Question',backref='quiz')
+    responses=db.relationship('QuizResponse',backref='quiz')
+
+
+
+class Question(db.Model):
+    __tablename__='questions'
+    id=db.Column(db.Integer, primary_key=True)
+    quiz_id=db.Column(db.Integer, db.ForeignKey('quizzes.id'))
+    question=db.Column(db.String(),nullable=False)
+    options=db.relationship('Option',backref='question')
+    ans=db.Column(db.String(),nullable=False)
+    marks=db.Column(db.Integer,nullable=False,default=1)
+    is_multicorrect=db.Column(db.Boolean,default=False)
+    responses=db.relationship('quizQuestionResponse',backref='question')
+
+class Option(db.Model):
+    __tablename__='options'
+    id=db.Column(db.Integer, primary_key=True)
+    question_id=db.Column(db.Integer, db.ForeignKey('questions.id'))
+    option=db.Column(db.String,nullable=False)
+    is_right=db.Column(db.Boolean,default=False)  #for partial marking support
+
+
+
+class quizQuestionResponse(db.Model):
+    __tablename__='quizquestionresponses'
+    id=db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    question_id=db.Column(db.Integer, db.ForeignKey('questions.id'))
+    quiz_id=db.Column(db.Integer, db.ForeignKey('quizzes.id'))
+    response=db.Column(db.String(),nullable=False)
+    quiz_response_id=db.Column(db.Integer, db.ForeignKey('quizresponses.id'))
+    @property
+    def isCorrect(self):
+        return self.response.strip.split(',').sorted()==self.question.ans.strip.split(',').sorted()
+    @property
+    def marks(self):
+        if self.isCorrect:
+            return self.question.marks
+        else: 
+            return 0
+            
+
+
+
+
+
+class QuizResponse(db.Model):
+    __tablename__='quizresponses'
+    id=db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    quiz_id=db.Column(db.Integer,db.ForeignKey('quizzes.id'))
+    quizQuestionResponses=db.relationship('quizQuestionResponse',backref='quiz_response')
+
+
+
+
+    
+
+class DiscussionThread(db.Model):
+    __tablename__='discussionthreads'
+    id=db.Column(db.Integer, primary_key=True)
+    course_id=db.Column(db.Integer, db.ForeignKey('courses.id'))
+    title= db.Column(db.String())
+    details = db.Column(db.String())
+    posts=db.relationship('DiscussionPost',backref='quiz_response')
+
+class DiscussionPost(db.Model):
+    __tablename__='discussionposts'
+    id=db.Column(db.Integer, primary_key=True)
+    discussion_id=db.Column(db.Integer, db.ForeignKey('discussionthreads.id'))
+    user_id=db.Column(db.Integer, db.ForeignKey('users.id'))
+    title= db.Column(db.String())
+    details = db.Column(db.String())
+    attachments=db.relationship('Attachment',backref='post')

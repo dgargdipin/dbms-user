@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField,SelectField,SelectMultipleField,TextAreaField
+from wtforms.fields.core import RadioField
 from wtforms.fields.simple import MultipleFileField
 from wtforms import ValidationError
 from flask_wtf.file import FileField,FileAllowed
@@ -12,3 +13,14 @@ class submissionForm(FlaskForm):
     details = TextAreaField('Details')
     attachments=MultipleFileField('Attachments')
     submit=SubmitField('Submit')
+
+
+def quiz_factory(quiz):
+    class QuizForm(FlaskForm):
+        Submit=SubmitField('Submit')
+    for question in quiz.questions:
+        if question.is_multicorrect:
+            setattr(QuizForm, f"question_{question.id}", SelectMultipleField(question.question,choices=[(option.id,option.option) for option in question.options],coerce=int))
+        else:
+            setattr(QuizForm, f"question_{question.id}", RadioField(question.question,choices=[(option.id,option.option) for option in question.options],coerce=int))
+    return QuizForm,['Submit']

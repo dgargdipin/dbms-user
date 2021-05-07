@@ -2,16 +2,16 @@ import string
 import random
 import os
 from flask import render_template, url_for, flash, redirect, request, Blueprint, abort,send_from_directory
+from flask.templating import render_template_string
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
 from cms import basedir,db
-
-from cms.models import Attachment, Submission, User, Course
+from cms.models import Attachment, Quiz, QuizResponse, Submission, User, Course, quizQuestionResponse
 
 from cms.users.forms import RegistrationForm, LoginForm, UpdateUserForm
 CourseBluerint = Blueprint('course', __name__)
 cb=CourseBluerint
-from .forms import submissionForm
+from .forms import quiz_factory, submissionForm
 @cb.route('/serve/<filename>')
 @login_required
 def serve_file(filename):
@@ -72,3 +72,29 @@ def unenroll(course_id):
     current_user.courses.remove(courseToDrop)
     db.session.commit()
     return redirect(url_for('core.index'))
+
+
+@cb.route('/quiz/attempt/<quiz_id>',methods=['GET', 'POST'])
+def attempt_quiz(quiz_id):
+    current_quiz=Quiz.query.get_or_404(quiz_id)
+    # if current_user not in current_quiz.course.students:
+        # abort(405)
+    quiz_Class,default_fields=quiz_factory(current_quiz)
+    quiz_form=quiz_Class()
+    if quiz_form.Submit.data and quiz_form.validate:
+        print(quiz_form.data.items())
+        qResponse=QuizResponse(user_id=current_user.id,quiz_id=quiz_id)
+        db.session.add(qResponse)
+        for field in quiz_form:
+            if not field.name.startswith("question"):continue
+            print(field.name)
+            question_id=int(field.name.split('_')[1])
+            qqResponse=quizQuestionResponse(user_id=current_user.id,question_id=question_id,quiz_id=quiz_id,response=str(field.data))
+            db.session.add(qqResponse)
+            qResponse.quizQuestionResponses.append(qqResponse)
+        db.session.commit()
+    
+
+
+        
+    return render_template('give_quiz.html',form=quiz_form,)

@@ -200,10 +200,11 @@ class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     name=db.Column(db.String(),nullable=False)
-    start_time=db.Column(db.DateTime,nullable=False)
-    end_time=db.Column(db.DateTime,nullable=False)
+    start_time=db.Column(db.DateTime,nullable=False,default=datetime.now())
+    end_time=db.Column(db.DateTime,nullable=False,default=datetime.now())
     questions=db.relationship('Question',backref='quiz')
     responses=db.relationship('QuizResponse',backref='quiz')
+    # max_attempts=db.Column(db.Integer,default=1)
 
 
 
@@ -237,7 +238,7 @@ class quizQuestionResponse(db.Model):
     quiz_response_id=db.Column(db.Integer, db.ForeignKey('quizresponses.id'))
     @property
     def isCorrect(self):
-        return self.response.strip.split(',').sorted()==self.question.ans.strip.split(',').sorted()
+        return self.response.strip('][').split(',').sorted()==self.question.ans.strip.split(',').sorted()
     @property
     def marks(self):
         if self.isCorrect:

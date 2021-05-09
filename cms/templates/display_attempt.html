@@ -41,7 +41,7 @@
                         <h5 class="mt-1 ml-2 r-5">{{ question.question }}</h5>
                     </div>
                     <div class="d-flex flex-row">
-                        <h4 class="ml-4">Marks: {{questionAttempt.markss}}/{{ question.marks }}</h4>
+                        <h4 class="ml-4">Marks: {{questionAttempt.marks}}/{{ question.marks }}</h4>
                     </div>
                     {% for option in question.options %}
                     {% if option.id|string in attemptlist %}

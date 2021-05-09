@@ -244,7 +244,7 @@ class quizQuestionResponse(db.Model):
     def isCorrect(self):
         return sorted(self.response.split(','))==sorted(self.question.ans.split(','))
     @property
-    def markss(self):
+    def marks(self):
         if self.isCorrect:
             return self.question.marks
         else: 
@@ -270,7 +270,12 @@ class QuizResponse(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     quiz_id=db.Column(db.Integer,db.ForeignKey('quizzes.id'))
     quizQuestionResponses=db.relationship('quizQuestionResponse',backref='quiz_response')
-
+    @property
+    def marks(self):
+        ans=0
+        for qqr in self.quizQuestionResponses:
+            ans+=qqr.marks
+        return ans
 
 
 

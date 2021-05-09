@@ -102,7 +102,7 @@ def attempt_quiz(quiz_id):
             db.session.add(qqResponse)
             qResponse.quizQuestionResponses.append(qqResponse)
         db.session.commit()
-    
+        return redirect(url_for('course.handle_quiz',course_id=current_quiz.course.id,quiz_id=current_quiz.id))
 
 
         

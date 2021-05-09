@@ -208,6 +208,12 @@ class Quiz(db.Model):
     def responded_by(self):
         return [a.user for a in self.responses]
     # max_attempts=db.Column(db.Integer,default=1)
+    @property
+    def marks(self):
+        ans=0
+        for q in self.questions:
+            ans+=q.marks
+        return ans
 
 
 

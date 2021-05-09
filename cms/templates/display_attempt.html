@@ -26,6 +26,8 @@
 
 
 {% block content %}
+<h1 class="display-3 text-center">Attempt Score - {{attempt.marks}}/{{attempt.quiz.marks}}</h1>
+
 {# <a href="{{ url_for('course.add_question_to_quiz', course_id=course_id, quiz_id=quiz_id) }}"
     class="btn btn-primary">Add More Questions</a> #}
 {% for question,questionAttempt in zip(attempt.quiz.questions,attempt.quizQuestionResponses) %}

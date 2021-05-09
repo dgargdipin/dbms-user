@@ -204,6 +204,9 @@ class Quiz(db.Model):
     end_time=db.Column(db.DateTime,nullable=False,default=datetime.now())
     questions=db.relationship('Question',backref='quiz')
     responses=db.relationship('QuizResponse',backref='quiz')
+    @property 
+    def responded_by(self):
+        return [a.user for a in self.responses]
     # max_attempts=db.Column(db.Integer,default=1)
 
 
@@ -218,6 +221,7 @@ class Question(db.Model):
     marks=db.Column(db.Integer,nullable=False,default=1)
     is_multicorrect=db.Column(db.Boolean,default=False)
     responses=db.relationship('quizQuestionResponse',backref='question')
+    is_partial = db.Column(db.Boolean, default=False)
 
 class Option(db.Model):
     __tablename__='options'
@@ -238,14 +242,23 @@ class quizQuestionResponse(db.Model):
     quiz_response_id=db.Column(db.Integer, db.ForeignKey('quizresponses.id'))
     @property
     def isCorrect(self):
-        return self.response.strip('][').split(',').sorted()==self.question.ans.strip.split(',').sorted()
+        return sorted(self.response.split(','))==sorted(self.question.ans.split(','))
     @property
-    def marks(self):
+    def markss(self):
         if self.isCorrect:
             return self.question.marks
         else: 
-            return 0
-            
+            if self.question.is_partial:
+                ans=0
+                for resp_id_string in self.response.split(','):
+                    print(resp_id_string,self.question.ans.split(','),self.response)
+                    if resp_id_string in self.question.ans.split(','):
+                        ans+=1
+                return ans*self.question.marks/len(self.question.ans.split(','))
+            else: return 0
+    @property
+    def attemptlist(self):
+        return self.response.split(',')
 
 
 

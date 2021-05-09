@@ -1,3 +1,4 @@
+from cms.models import Quiz
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField,SelectField,SelectMultipleField,TextAreaField
 from wtforms.fields.core import RadioField
@@ -17,10 +18,13 @@ class submissionForm(FlaskForm):
 
 def quiz_factory(quiz):
     class QuizForm(FlaskForm):
-        Submit=SubmitField('Submit')
+        pass
+    
     for question in quiz.questions:
         if question.is_multicorrect:
-            setattr(QuizForm, f"question_{question.id}", SelectMultipleField(question.question,choices=[(option.id,option.option) for option in question.options],coerce=int))
+            setattr(QuizForm, f"question_{question.id}", SelectMultipleField(question.question,choices=[(option.id,option.option) for option in question.options],coerce=int,validators=[DataRequired('Data required')]))
         else:
-            setattr(QuizForm, f"question_{question.id}", RadioField(question.question,choices=[(option.id,option.option) for option in question.options],coerce=int))
+            setattr(QuizForm, f"question_{question.id}", RadioField(question.question,choices=[(option.id,option.option) for option in question.options],coerce=int,validators=[DataRequired('Data required')]))
+    setattr(QuizForm,'Submit',SubmitField('Submit'))
+    print(vars(QuizForm))
     return QuizForm,['Submit']

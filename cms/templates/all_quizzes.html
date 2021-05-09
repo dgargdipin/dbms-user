@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block personal %}
+<style>
+    div {
+        padding: 30px 15px 25px 40px;
+    }
+</style>
+{% endblock personal %}
+
+{% block content %}
+<div>
+</div>
+{% for quiz in quizzes %}
+<div class="card">
+    <h5 class="card-header">{{ quiz.name }}</h5>
+    <div class="card-body">
+        <a href="{{ url_for('course.handle_quiz', course_id=course_id, quiz_id=quiz.id) }}"
+            class="btn btn-primary btn-lg" role="button" aria-pressed="true">{{ quiz.name }}</a>
+        <h5 class="card-text">Start Time: {{ quiz.start_time }}</h5>
+        <h5 class="card-text">End Time: {{ quiz.end_time }}</h5>
+    </div>
+</div>
+<div>
+</div>
+{% endfor %}
+{% endblock content %}

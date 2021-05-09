@@ -1,0 +1,61 @@
+{% extends 'base.html'%}
+{% macro form_field(field) %}
+<dt>{{ field.label }}
+<dd>{{ field(**kwargs)|safe }}
+  {% if field.errors %}
+  <ul class=errors>
+    {% for error in field.errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</dd>
+{% endmacro %}
+
+{% block personal %}
+    <style>
+    body {
+        background-color: #eee
+    }
+.ans {
+    margin-left: 36px !important
+}
+    </style>
+{% endblock personal %}
+
+
+{% block content %}
+    {# <a href="{{ url_for('course.add_question_to_quiz', course_id=course_id, quiz_id=quiz_id) }}" class="btn btn-primary">Add More Questions</a> #}
+    {% for question in questions %}
+        {% set cur_count = loop.index - 1 %}
+        <div class="container mt-5">
+        <div class="d-flex justify-content-center row">
+        <div class="col-md-10 col-lg-10">
+            <div class="border">
+                <div class="question bg-white p-3 border-bottom">
+                    <div class="d-flex flex-row question-title">
+                        <h3 class="text-danger">Q.</h3>
+                        <h5 class="mt-1 ml-2 r-5">{{ question.question }}</h5>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <h4 class="ml-4">Marks: {{ question.marks }}</h4>
+                    </div>
+                    {% for option in question.options %}
+                        {% if bool_values[cur_count][loop.index - 1] %}
+                            <div class="ans ml-2">
+                                <p class="p-3 mb-2 bg-success text-white font-monospace text-decoration-none">{{ option.option }}</p>
+                            </div>
+                        {% else %}
+                            <div class="ans ml-2">
+                                <p class="p-3 mb-2 bg-danger text-white font-monospace text-decoration-none">{{ option.option }}</p>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+    {% endfor %}
+
+{% endblock %} 

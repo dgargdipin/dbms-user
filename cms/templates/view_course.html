@@ -20,6 +20,8 @@
     <p class="lead">
         <!-- <a class="btn btn-danger" href="{{url_for('course.unenroll',course_id=course.id)}}" role="button">Drop Course</a> -->
         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDrop">Drop Course</button>
+        <a href="{{ url_for('course.all_quizzes', course_id=course.id) }}" class="btn btn-primary">View Quizzes</a>
+
     </p>
 </div>
 

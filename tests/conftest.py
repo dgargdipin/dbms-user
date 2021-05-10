@@ -1,6 +1,6 @@
 import pytest
-from cms import App, db
-from cms.models import User
+from cms import app, db
+from cms.models import User,Professor
 
 
 @pytest.fixture(scope='module')
@@ -11,7 +11,7 @@ def new_user():
 
 @pytest.fixture(scope='module')
 def test_client():
-    flask_app = App
+    flask_app = app
 
     # Create a test client using the Flask application configured for testing
     with flask_app.test_client() as testing_client:
@@ -23,18 +23,16 @@ def test_client():
 @pytest.fixture(scope='module')
 def init_database(test_client):
     # Create the database and the database table
-    db.create_all()
-
     # Insert user data
-    user1 = User(email='patkennedy79@gmail.com', plaintext_password='FlaskIsAwesome')
-    user2 = User(email='kennedyfamilyrecipes@gmail.com', plaintext_password='PaSsWoRd')
+    user1 = User('Dipin','dgargdipin@gmail.com','abc','1',1)
+    user2 = Professor("Professor 1","prof1@gmail.com","prof1",2)
     db.session.add(user1)
     db.session.add(user2)
 
     # Commit the changes for the users
     db.session.commit()
 
-    yield  # this is where the testing happens!
+    yield db # this is where the testing happens!
 
     db.drop_all()
 

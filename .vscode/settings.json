@@ -4,5 +4,5 @@
     },
     "python.linting.enabled": true,
     "workbench.colorTheme": "Visual Studio Dark",
-    "python.pythonPath": "/usr/bin/python3"
+    "python.pythonPath": "/home/dgargdipin/devLinux/project/professor/venv/bin/python3"
 }

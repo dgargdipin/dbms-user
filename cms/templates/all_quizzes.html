@@ -10,17 +10,26 @@
 {% block content %}
 <div>
 </div>
+{% if quizzes %}
 {% for quiz in quizzes %}
 <div class="card">
     <h5 class="card-header">{{ quiz.name }}</h5>
     <div class="card-body">
-        <a href="{{ url_for('course.handle_quiz', course_id=course_id, quiz_id=quiz.id) }}"
-            class="btn btn-primary btn-lg" role="button" aria-pressed="true">{{ quiz.name }}</a>
-        <h5 class="card-text">Start Time: {{ quiz.start_time }}</h5>
-        <h5 class="card-text">End Time: {{ quiz.end_time }}</h5>
+                {% if quiz.start_time.now()>quiz.start_time %}
+                <a href="{{ url_for('course.handle_quiz', course_id=course_id, quiz_id=quiz.id) }}"
+                class="btn btn-primary btn-lg c1" role="button" aria-pressed="true">View</a>
+                {% endif %}
+                
+        <h5 class="card-text">Start Time: {{ quiz.start_time.strftime('%I:%M %p, %d %b %Y') }}</h5>
+        <h5 class="card-text">End Time: {{ quiz.end_time.strftime('%I:%M %p, %d %b %Y') }}</h5>
     </div>
 </div>
 <div>
 </div>
 {% endfor %}
+{% else %}
+<h1 class="display-2 d-flex align-items-center justify-content-center ">No quiz yet</h1>
+
+{% endif %}
+
 {% endblock content %}

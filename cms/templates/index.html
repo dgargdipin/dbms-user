@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="jumbotron">
+<div style="margin-top: 2%;" class="jumbotron">
         <h1 class="display-4">{% if current_user.is_authenticated %}
                 Welcome {{current_user.name}}
 </h1>
                 <hr class="my-4">
                 <p class="lead float-left">Branch: {{current_user.branch}}<br>Year: {{current_user.year}}</p><a
-                        class="btn btn-primary float-right" href="{{url_for('users.enroll')}}" role="button">Enroll in
+                        class="btn btn-primary float-right enr1" href="{{url_for('users.enroll')}}" role="button">Enroll in
                         courses </a>
                 {%else%}
-                <h1 class="display-4">Welcome to Course Management System</h1>
+                <h1 class="display-4">Welcome to PAATHSHAALA</h1>
                 <hr class="my-4">
-                <p class="lead">This is the CS 207 Database Management System created by Dipin Garg, Harsh Kushwaha and Jainil Shah. <br>With this project
+                <p class="lead">This is the CS 258 Course Management System created by Abhishek Bansal,Arastu,Dipin Garg,Harsh Kushwaha, Jainil Shah,Prasheel Kumar Tiwari. <br>With this project
                 we hope to ease up this difficult process of online classes for both professors and students.</p>
 
                 {% endif %}
@@ -35,7 +35,7 @@
                         {% for course in enrolled_courses %}
                         <tr>
                                                                 <td scope="row">{{loop.index}}</td>
-                                                                <td><a href={{url_for('course.view_course',course_id=course.id)}} class="btn btn-link">{{course.name}}</a></td>
+                                                                <td><a href={{url_for('course.view_course',course_id=course.id)}} class="btn btn-link view_course_links">{{course.name}}</a></td>
                                                                 <td>{{course.course_code}}</td>
                                                                 <td>{{ course.branches|join(', ') }}</td>
                                                                 <td>{{course.professor.name}}</a></td>

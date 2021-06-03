@@ -28,3 +28,8 @@ def quiz_factory(quiz):
     setattr(QuizForm,'Submit',SubmitField('Submit'))
     print(vars(QuizForm))
     return QuizForm,['Submit']
+
+class postForm(FlaskForm):
+    details = TextAreaField('Details', validators=[DataRequired('Data required')])
+    attachments = MultipleFileField('Attachments')
+    submit = SubmitField('Submit')

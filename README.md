@@ -1,5 +1,6 @@
 # paathshaala-user
-Repo for user portal of CS258 project
+Repo for user portal of CS258 project.
+
 The professor portal can be accessed [here](https://github.com/dgargdipin/dbms-professor/)
 #  Flask course management system with jinja2 as rendering engine
 ## Usage Instructions
